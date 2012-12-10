@@ -50,38 +50,48 @@ def instance_example():
             print i.tree
             print ''
 
-def write_instances(out_file='tmp.instances.psv', baseform=None, instances_limit=None, write_out_limit=None, min_args_num=None):
+def write_instances(out_file='tmp.instances.psv', baseform=None, instances_limit=None, write_out_limit=None, max_arg_num=10):
     instances = propbank.instances()[:instances_limit] if instances_limit else propbank.instances()
     instances = [i for i in instances if i.baseform == baseform] if baseform else instances
     instances = instances[:write_out_limit] if write_out_limit else instances
-    instances = [i for i in instances if len(i.arguments) == min_args_num] if min_args_num else instances
+    #instances = [i for i in instances if len(i.arguments) == min_args_num] if min_args_num else instances
 
     ofile = open(out_file,'w')
-    sep = '|'
-
+    fieldnames = ('baseform','inflection','predicate')
+    argnames = [('ARG%d_descr'%i, 'ARG%d'%i) for i in range(max_arg_num)]
+    fieldnames += tuple([item for sublist in argnames for item in sublist])
+    writer = csv.DictWriter(ofile, fieldnames=fieldnames)
+    headers = dict((n,n) for n in fieldnames)
+    writer.writerow(headers)
     for i in instances: 
-        ofile.write(i.baseform+sep)
-        args = rs_args(i.roleset)
-        ofile.write(str(i.inflection)+sep)
+        row = {}
 
-        predicate = ''.join(i.predicate.select(i.tree)) if i.tree else i.baseform
-        ofile.write(predicate+sep)
+        row['baseform'] = i.baseform
+        row['inflection'] = i.inflection
+        row['predicate'] = ''.join(i.predicate.select(i.tree)) if i.tree else None
+
+        args = rs_args(i.roleset)
 
         for a in i.arguments:
             id = a[1]
             if id in args:
-                ofile.write(args[a[1]]+sep)
-                if i.tree:
-                    t = a[0].select(i.tree)
-                    ofile.write(' '.join(t.leaves())+sep)
+                row['%s_descr'%id] = args[a[1]]
+                row[id] = ' '.join(a[0].select(i.tree).leaves()) if i.tree else None
 
-        ofile.write('\n')
+            print 'row (printing)'
+            print row
+            print 'row (writing'
+            writer.writerow(row)
+
+    ofile.close()
 
 if __name__ == '__main__':
     #instanceExample()
 
     #write_instances(baseform='acquire', instances_limit=10000, write_out_limit=None, min_args_num=2)
-    write_instances(baseform='acquire', instances_limit=None, write_out_limit=None, min_args_num=2)
+    write_instances(baseform='acquire', instances_limit=10000, write_out_limit=None)
+    #write_instances(baseform='acquire', instances_limit=None, write_out_limit=None, min_args_num=2)
+    #write_instances(baseform='acquire', instances_limit=None, write_out_limit=None)
 
 
 
