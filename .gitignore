@@ -36,3 +36,6 @@ nosetests.xml
 
 # Mac OS
 .DS_Store
+
+# Miscellaneous
+tmp.*
