@@ -1,97 +1,166 @@
 from nltk.corpus import propbank
 import csv
+from util import *
 
-def vprt(nm,v): print '%-14s %s' % (nm+':',v)
-def ctr(msg): print msg.center(80,'_')
-def ctrs(msg): print msg.center(50,'_')
+def rs_args(id, cache={}):
+    if id in cache:
+        return cache[id]
 
-def rs_args(id):
-    rs = propbank.roleset(id)
+    print 'roleset %s (cache miss)' % id
+
     args = {}
-    roles = rs[0]
-    for i, role in enumerate(roles.findall('role')):
-        args['ARG'+role.attrib['n']] = role.attrib['descr']
+    try:
+        rs = propbank.roleset(id)
+        roles = rs[0]
+        for i, role in enumerate(roles.findall('role')):
+            args['ARG'+role.attrib['n']] = role.attrib['descr']
+    except ValueError as e:
+        print e
+
+    cache[id] = args
+
     return args
 
-def instance_example():
-    for baseform in ['acquire','purchase']:
-        for i in [i for i in propbank.instances()[:2000] if i.baseform == baseform][:3]:
-            ctr(i.baseform)
-            vprt('fileid',i.fileid)
-            vprt('sentnum',i.sentnum)
-            vprt('wordnum',i.wordnum)
-            vprt('roleset',i.roleset)
-            args = rs_args(i.roleset)
-            vprt('inflection',i.inflection)
-            vprt('tagger',i.tagger)
+def get_instances(baseforms=None, instances_limit=None):
+    instances = propbank.instances()[:instances_limit] if instances_limit else propbank.instances()
+    instances = [i for i in instances if i.baseform in baseforms] if baseforms else instances
+    return instances
 
-            ctrs('sentence')
+def print_instances(instances):
+    rscache = {}
+    for idx,i in enumerate(instances):
+        ctr(i.baseform)
+        vprt('num',idx)
+        vprt('fileid',i.fileid)
+        vprt('sentnum',i.sentnum)
+        vprt('wordnum',i.wordnum)
+        vprt('roleset',i.roleset)
+        args = rs_args(i.roleset, cache=rscache)
+        vprt('inflection',i.inflection)
+        vprt('tagger',i.tagger)
+
+        ctrs('sentence')
+        if i.tree:
             print ' '.join(i.tree.leaves())
+        else:
+            print '<no tree>'
 
-            ctrs('predicate')
-            vprt('wordnum',i.predicate.wordnum)
-            vprt('height',i.predicate.height)
-            vprt('word', ''.join(i.predicate.select(i.tree)))
+        ctrs('predicate')
+        vprt('wordnum',i.predicate.wordnum)
+        vprt('height',i.predicate.height)
+        if i.tree:
+            vprt('word', ''.join(i.predicate.select(i.tree).leaves()))
             print i.predicate.select(i.tree)
-            #vprt('parse_corpus',i.parse_corpus)
+        else:
+            vprt('word','<no tree>')
+        #vprt('parse_corpus',i.parse_corpus)
 
-            for a in i.arguments:
-                id = a[1]
-                ctrs(id)
-                if id in args:
-                    vprt('descr', args[a[1]])
-                    vprt('loc',a[0])
+        for a in i.arguments:
+            id = a[1]
+            ctrs(id)
+            if id in args:
+                vprt('descr', args[a[1]])
+                vprt('loc',a[0])
+                if i.tree:
                     t = a[0].select(i.tree)
                     vprt('arg', ' '.join(t.leaves()))
                     print t
+                else:
+                    print '<no tree>'
 
-            ctrs('tree')
-            #vprt('tree leaves', i.tree.leaves())
-            print i.tree
-            print ''
+        ctrs('tree')
+        #vprt('tree leaves', i.tree.leaves())
+        print i.tree
+        print ''
 
-def write_instances(out_file='tmp.instances.psv', baseform=None, instances_limit=None, write_out_limit=None, max_arg_num=10):
-    instances = propbank.instances()[:instances_limit] if instances_limit else propbank.instances()
-    instances = [i for i in instances if i.baseform == baseform] if baseform else instances
-    instances = instances[:write_out_limit] if write_out_limit else instances
-    #instances = [i for i in instances if len(i.arguments) == min_args_num] if min_args_num else instances
-
+def write_instances(instances, out_file='tmp.instances.csv', max_arg_num=10):
     ofile = open(out_file,'w')
-    fieldnames = ('baseform','inflection','predicate')
+    fieldnames = (
+            'num',
+            'baseform',
+            'fileid',
+            'tagger',
+            'sentnum',
+            'wordnum',
+            'inflection',
+            'sentence',
+            'predicate',
+            'roleset'
+            )
     argnames = [('ARG%d_descr'%i, 'ARG%d'%i) for i in range(max_arg_num)]
     fieldnames += tuple([item for sublist in argnames for item in sublist])
+
     writer = csv.DictWriter(ofile, fieldnames=fieldnames)
     headers = dict((n,n) for n in fieldnames)
     writer.writerow(headers)
-    for i in instances: 
+
+    rscache = {}
+    for idx,i in enumerate(instances): 
         row = {}
 
+        if not i.tree:
+            print 'instance %d (%s, %s): WARNING:  skipping because no TB tree available' % (idx, i.baseform, i.fileid)
+            continue
+
+        row['num'] = idx
         row['baseform'] = i.baseform
         row['inflection'] = i.inflection
-        row['predicate'] = ''.join(i.predicate.select(i.tree)) if i.tree else None
+        row['predicate'] = ''.join(i.predicate.select(i.tree).leaves()) if i.tree else None
+        row['fileid'] = i.fileid
+        row['sentnum'] = i.sentnum
+        row['wordnum'] = i.wordnum
+        row['tagger'] = i.tagger
+        row['sentence'] = ' '.join(i.tree.leaves()) if i.tree else None
+        row['roleset'] = i.roleset
 
-        args = rs_args(i.roleset)
+        args = rs_args(i.roleset, cache=rscache)
 
         for a in i.arguments:
             id = a[1]
             if id in args:
                 row['%s_descr'%id] = args[a[1]]
                 row[id] = ' '.join(a[0].select(i.tree).leaves()) if i.tree else None
+            else:
+                print 'instance %d (%s): WARNING:  %s not among known args!'%(idx,i.baseform,id)
+                print '\t'+' '.join(a[0].select(i.tree).leaves()) if i.tree else ''
+                print ''
 
-            print 'row (printing)'
-            print row
-            print 'row (writing'
+        try:
             writer.writerow(row)
+        except ValueError as e: 
+            print 'instance %d: WARNING:  problem writing row'% idx
+            print e
 
     ofile.close()
 
 if __name__ == '__main__':
-    #instanceExample()
 
-    #write_instances(baseform='acquire', instances_limit=10000, write_out_limit=None, min_args_num=2)
-    write_instances(baseform='acquire', instances_limit=10000, write_out_limit=None)
-    #write_instances(baseform='acquire', instances_limit=None, write_out_limit=None, min_args_num=2)
-    #write_instances(baseform='acquire', instances_limit=None, write_out_limit=None)
+    print 'instances (retrieving)'
+    #instances_limit = 1000
+    instances_limit = None
+    #baseforms = ['acquire','purchase']
+    business_baseforms = [
+            'advise',
+            'employ',
+            'hire',
+            'make',
+            'produce',
+            'acquire',
+            'purchase',
+            'market',
+            'sell',
+            'sponsor',
+            'issue'
+            ]
+    baseforms = None
+    #baseforms = business_baseforms
+    i = get_instances(baseforms=baseforms, instances_limit=instances_limit)
+
+    #print 'instances (printing)'
+    #print_instances(instances=i)
+
+    print 'instances (writing)'
+    write_instances(instances=i)
 
 
 
