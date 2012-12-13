@@ -1,6 +1,21 @@
 from nltk.corpus import propbank
+from nltk.corpus.reader.propbank import *
 import csv
 from util import *
+
+business_baseforms = [
+        'advise',
+        'employ',
+        'hire',
+        'make',
+        'produce',
+        'acquire',
+        'purchase',
+        'market',
+        'sell',
+        'sponsor',
+        'issue'
+        ]
 
 def rs_args(id, cache={}):
     if id in cache:
@@ -36,7 +51,13 @@ def print_instances(instances):
         vprt('wordnum',i.wordnum)
         vprt('roleset',i.roleset)
         args = rs_args(i.roleset, cache=rscache)
-        vprt('inflection',i.inflection)
+        infl = i.inflection
+        vprt('inflection',infl)
+        vprt('  form',infl.form)
+        vprt('  tense',infl.tense)
+        vprt('  aspect',infl.aspect)
+        vprt('  person',infl.person)
+        vprt('  voice',infl.voice)
         vprt('tagger',i.tagger)
 
         ctrs('sentence')
@@ -46,8 +67,13 @@ def print_instances(instances):
             print '<no tree>'
 
         ctrs('predicate')
-        vprt('wordnum',i.predicate.wordnum)
-        vprt('height',i.predicate.height)
+        if isinstance(i.predicate, PropbankSplitTreePointer):
+            print 'WARNING: PropbankSplitTreePointer'
+            for tr in i.predicate.pieces:
+                print tr
+        else:
+            vprt('wordnum',i.predicate.wordnum)
+            vprt('height',i.predicate.height)
         if i.tree:
             vprt('word', ''.join(i.predicate.select(i.tree).leaves()))
             print i.predicate.select(i.tree)
@@ -138,29 +164,17 @@ if __name__ == '__main__':
     print 'instances (retrieving)'
     #instances_limit = 1000
     instances_limit = None
-    #baseforms = ['acquire','purchase']
-    business_baseforms = [
-            'advise',
-            'employ',
-            'hire',
-            'make',
-            'produce',
-            'acquire',
-            'purchase',
-            'market',
-            'sell',
-            'sponsor',
-            'issue'
-            ]
+
     baseforms = None
     #baseforms = business_baseforms
+
     i = get_instances(baseforms=baseforms, instances_limit=instances_limit)
 
-    #print 'instances (printing)'
-    #print_instances(instances=i)
+    print 'instances (printing)'
+    print_instances(instances=i)
 
-    print 'instances (writing)'
-    write_instances(instances=i)
+    #print 'instances (writing)'
+    #write_instances(instances=i)
 
 
 
