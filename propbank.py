@@ -165,16 +165,16 @@ if __name__ == '__main__':
     #instances_limit = 1000
     instances_limit = None
 
-    baseforms = None
-    #baseforms = business_baseforms
+    #baseforms = None
+    baseforms = business_baseforms
 
     i = get_instances(baseforms=baseforms, instances_limit=instances_limit)
 
-    print 'instances (printing)'
-    print_instances(instances=i)
+    #print 'instances (printing)'
+    #print_instances(instances=i)
 
-    #print 'instances (writing)'
-    #write_instances(instances=i)
+    print 'instances (writing)'
+    write_instances(instances=i)
 
 
 
