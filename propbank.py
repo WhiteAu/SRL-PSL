@@ -90,6 +90,7 @@ def print_instances(instances):
                 if i.tree:
                     t = a[0].select(i.tree)
                     vprt('arg', ' '.join(t.leaves()))
+                    vprt('filtered',' '.join([word for (word, pos) in t.pos() if pos in ['NNP','NNPS']]))
                     print t
                 else:
                     print '<no tree>'
@@ -113,7 +114,7 @@ def write_instances(instances, out_file='tmp.instances.csv', max_arg_num=10):
             'predicate',
             'roleset'
             )
-    argnames = [('ARG%d_descr'%i, 'ARG%d'%i) for i in range(max_arg_num)]
+    argnames = [('ARG%d_descr'%i, 'ARG%d'%i, 'ARG%d_NNP'%i) for i in range(max_arg_num)]
     fieldnames += tuple([item for sublist in argnames for item in sublist])
 
     writer = csv.DictWriter(ofile, fieldnames=fieldnames)
@@ -145,6 +146,7 @@ def write_instances(instances, out_file='tmp.instances.csv', max_arg_num=10):
             id = a[1]
             if id in args:
                 row['%s_descr'%id] = args[a[1]]
+                row['%s_NNP'%id] = ' '.join([word for (word, pos) in a[0].select(i.tree).pos() if pos in ['NNP','NNPS']]) if i.tree else None
                 row[id] = ' '.join(a[0].select(i.tree).leaves()) if i.tree else None
             else:
                 print 'instance %d (%s): WARNING:  %s not among known args!'%(idx,i.baseform,id)
