@@ -18,10 +18,11 @@ def fb_to_pb_map(map_file):
     f.close()
     return f2p
 
-def pb_instances(fb_file, f2p_map):
+def pb_instances(fb_dir, fbr, f2p):
     """
     Convert a FB instance file to a list of PB instances.
     """
+    fb_file = '%s/%s.tsv'%(fb_dir,fbr)
     pb = []
     with open(fb_file,'r') as f:
         for row in csv.DictReader(f,delimiter='\t'):
@@ -34,5 +35,5 @@ if __name__ == '__main__':
     f2p = fb_to_pb_map('FB_to_PB.csv')
     for fbr in ['acquisition']:
         ctr(fbr)
-        pb = pb_instances('tmp.business_Freebase/%s.tsv'%fbr, f2p)
+        pb = pb_instances('tmp.business_Freebase', fbr, f2p)
         print pb[:10]
