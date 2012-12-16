@@ -1,0 +1,4 @@
+fb_rel,pb_rel,fb_arg,pb_arg
+acquisition,acquire,company_acquired,ARG1
+acquisition,acquire,acquiring_company,ARG0
+
