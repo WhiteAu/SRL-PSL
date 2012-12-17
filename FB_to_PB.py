@@ -13,7 +13,9 @@ def fb_to_pb_map(map_file):
             header=False
             continue
         (fbr,pbr,fba,pba) = line.strip().split(',')
-        if fbr not in f2p: f2p[fbr]={}
+        if fbr not in f2p: 
+            f2p[fbr]={}
+            f2p[fbr]['PROPBANK_RELATION'] = pbr
         f2p[fbr][fba] = pba
     f.close()
     return f2p
