@@ -3,10 +3,48 @@ PropBank is an annotation layer on top of the Wall Street Journal portion of Pen
 We extracted the schema and predicate instances from PB using the Natural Language Toolkit~\cite{bird_nltk:_2006} and we retrieved the schema and relation instances from the business domain of FB from data dumps available on the FB web site.
 Furthermore, we limited our alignment only to the most common predicates from PB.  The following figures illustrate the frequencies of common PB predicates and FB relations.
 
-CHARTS! 
+\begin{figure} [ht]
+
+\begin{center}
+{\label{avgstalls_CIF}\includegraphics[width = 2in, height = 1.5in]{propverbs.png}}
+\caption{Propbank Verbs}
+\vspace{-0.5cm}
+\label{}
+\end{center}
+\end{figure}
+
+\begin{figure} [ht]
+\begin{center}
+{\label{avgstalls_CIF}\includegraphics[width = 2in, height = 1.5in]{freebaserels.png}}
+\caption{Freebase Relations}
+\vspace{-0.5cm}
+\label{}
+\end{center}
+\end{figure}
+
 The following table shows predicates and relations we expected to be aligned.
 
-TABLES!
+\begin{table} [ht]
+\begin{center}
+\small{
+\begin{tabular}{p{3cm}p{4cm}p{4.5cm}}
+\noalign{\smallskip}
+\hline
+Area & Propbank Verbs & Freebase Relations\\	
+\hline
+Advising & advise & company\_ advisor \\
+Employment & employ, hire & employment\_ tenure, employer\\
+Products & make, produce, market, sell & company\_product\_relationship\\
+Purchasing	& acquire, purchase, sell	& acquisition\\
+Sponsors	&sponsor	&sponsorship\\
+Stock	&issue&	issue\\
+\hline
+\end{tabular}
+}
+\caption{Aligning Propbank verbs to Freebase relations}
+\vspace{-0.4cm}
+\end{center}
+\end{table}
 
 Our goal for alignment was to generate automatically mappings between the PB and FB at the schema level for relations and the arguments of the relations; for example the PB predicate acquire may map to the FB relation acquisition.
 Furthermore, acquire has a roleset acquire.01 - in general, PB predicates may have multiple rolesets - which defines four numbered arguments including the agent acquiring something, the thing acquired and the price paid.
@@ -34,7 +72,36 @@ Both rules have weight $w_1 = 20$.
 The following table shows example output of our alignment on relations; upon inspection, it appears that mappings with higher truth values are quite close to what we expect.
 Notably, the mapping between hire and employment was inferred through the transitive rule and similarity in argument instances, though the predicate and relation have dissimilar names.
 
-TABLE!!!
+\begin{table} [ht]
+\begin{center}
+\small{
+\begin{tabular}{p{3cm}p{3cm}p{2cm}}
+\noalign{\smallskip}
+\hline
+PB Predicate & FB Relation & Truth Value\\	
+\hline
+issue & issue & 1.0 \\
+issue &issuer & 0.99  \\
+issue & holding & 0.97\\
+employ	& employment	& 0.97\\
+acquire	&acquisition	& 0.96\\
+sponsor	&sponsorship&	 0.96\\
+produce	&company\_product&	0.95\\
+market	&employment &	0.94\\
+issue	&employment &	0.94\\
+sponsor & company\_advisor & 0.94\\
+issue & company\_advisor & 0.94\\
+advise & company\_advisor & 0.94\\
+issue & asset\_ownership & 0.94\\
+hire & employment & 0.87\\
+
+\hline
+\end{tabular}
+}
+\caption{PSL Alignment Predictions}
+\vspace{-0.4cm}
+\end{center}
+\end{table}
 
 
 
