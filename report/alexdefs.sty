@@ -1,0 +1,21 @@
+% the packages i need
+
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{url}
+\usepackage{psfig}
+
+\newcommand{\fig}[3]{%
+    %\begin{figure}[htbp]%
+    \begin{figure}[h]%
+        \begin{center}%
+        		%\fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
+            \includegraphics[scale=.20]{#2}
+            \caption{#3}%
+            \label{#1}%
+        \end{center}%
+    \end{figure}%
+}

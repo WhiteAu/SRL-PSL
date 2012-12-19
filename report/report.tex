@@ -1,0 +1,61 @@
+\documentclass[11pt,twocolumn]{article} % For LaTeX2e
+%\usepackage{nips12submit_e,times}
+\usepackage{graphicx}
+\usepackage{alexdefs}
+%\documentstyle[nips12submit_09,times,art10]{article} % For LaTeX 2.09
+
+
+\title{Computational Linguistics I Final Report}
+
+
+\author{
+Arti Ramesh, Scott White and Alex Memory \\
+Department of Computer Science\\
+University of Maryland\\
+College Park, MD 20742 \\
+}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+%\nipsfinalcopy % Uncomment for camera-ready version
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+    Semantic role labeling (SRL) is a task in which semantic labels for predicates and predicate arguments are assigned to constituents within the syntactic parse of a sentence, and is an approach for extracting meaning from sentences.  However, past machine learning approaches to SRL were limited by the availability of annotated SRL training corpora, and models trained on one corpus performed poorly on new corpora.  Our goal for this work was to use weak supervision to improve performance on unlabeled corpora or corpora in new domains while avoiding the expense of developing new training sets.  We evaluate our approach using the PropBank SRL training set, the database Freebase and the SwiRL SRL software; we discuss issues we encountered and suggest ways to refine the approach going forward.
+\end{abstract}
+
+%\section{Overview}
+%\label{sec:overview}
+%\input{overview}
+
+\section{The Problem}
+\label{sec:problem}
+\input{problem}
+
+\section{Our Approach}
+\label{sec:approach}
+\input{approach}
+
+\subsection{Corpus to Database Alignment}
+\label{sec:alignment}
+\input{alignment}
+
+\subsection{Weak Supervision}
+\label{sec:weak}
+\input{weak}
+
+\section{Results and Challenges}
+\label{sec:results}
+\input{results}
+
+\section{Conclusion}
+\label{sec:conclusion}
+\input{conclusion}
+
+\bibliographystyle{plain} \bibliography{refs}
+
+\end{document}

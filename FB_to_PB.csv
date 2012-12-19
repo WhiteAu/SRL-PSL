@@ -1,4 +1,15 @@
 fb_rel,pb_rel,fb_arg,pb_arg
 acquisition,acquire,company_acquired,ARG1
 acquisition,acquire,acquiring_company,ARG0
-
+sponsorship,sponsor,sponsored_by,ARG0
+sponsorship,sponsor,sponsored_recipient,ARG1
+company_advisor,advise,name,ARG0
+company_advisor,advise,companies_advised,ARG1
+employment_tenure,employ,company,ARG0
+employment_tenure,employ,person,ARG1
+company_product_relationship,produce,company,ARG0
+company_product_relationship,produce,consumer_product,ARG1
+issue,issue,name,ARG1
+issue,issue,issuer,ARG0
+holding,issue,holder,ARG0
+holding,issue,issue,ARG1
