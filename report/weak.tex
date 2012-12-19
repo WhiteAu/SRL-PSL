@@ -5,8 +5,8 @@ Then, for each matching TB sentence, we chose the verb and argument locations fo
 With the new PB annotation information thus chosen for each new instance, we added the new training instances to the original PB training set.
 
 During the alignment step, we were unable to completely map the relation arguments between PB and FB, but after filling in argument spots in the mappings by hand, we began finding some novel training instances, although many of them were not direct instances of the PB predicates but did seem to match with a related sense or at a coarser level.
-For example, for the acquire predicate, we generated the new training sentence, “AEG is 80\% owned by Daimler-Benz AG, the country's biggest industrial concern.”
-While this sentence does not include any form of the PB verb acquire, it does match at the more abstract level of ownership that may be desirable when extracting meaning from sentences.
+For example, for the {\tt acquire} predicate, we generated the new training sentence, “AEG is 80\% owned by Daimler-Benz AG, the country's biggest industrial concern.”
+While this sentence does not include any form of the PB verb {\tt acquire}, it does match at the more abstract level of ownership that may be desirable when extracting meaning from sentences.
 
 The final step was to train a SRL labeler on the expanded training set, and for this we used SwiRL~\cite{surdeanu_combination_2007}.
 Before doing so, we needed to recombine the new PB layer with TB and convert the result into the correct input format for SwiRL.  Helpfully, the SRL shared task materials for CoNLL-2005 included all the necessary software to do this.

@@ -1,18 +1,26 @@
-Many steps in our approach proved to be challenging, required manual intervention to fully complete or produced a small quantity of output.  This was the case with alignment, where our results appeared promising but did not complete the mapping of arguments which we needed.  Consequently, we also had very few new instances for training SwiRL.  Ultimately, the accuracy result from training SwiRL on the expanded training corpus improved only slightly over the accuracy from training on the original PB corpus.
-             corr.  excess  missed    prec.    rec.      F1
-------------------------------------------------------------
-  Overall    10609    2628    3468    80.15   75.36   77.68
-
-             corr.  excess  missed    prec.    rec.      F1
-------------------------------------------------------------
-  Overall    10821    2698    3186    80.04   77.25   78.62
-
+Many steps in our approach proved to be challenging, required manual intervention to fully complete or produced a small quantity of output.  This was the case with alignment, where our results appeared promising but did not complete the mapping of arguments which we needed.  Consequently, we also had very few new instances for training SwiRL.  Ultimately, the accuracy result from training SwiRL on the expanded training corpus, seen in Table~\ref{tab:accuracy}, improved only slightly over the accuracy from training on the original PB corpus.
+\begin{table}
+\centering
+\caption{SRL accuracy results with the original PropBank training corpus and with the novel instances found with our approach.}
+\begin{tabular}{ | l | c | c | c |}
+\hline
+Training Set & Prec. & Rec. & F1 \\ \hline \hline
+PropBank & 80.15 &  75.36 &  77.68 \\ \hline
+PropBank + Novel Instances & 80.04 & 77.25 & 78.62 \\ \hline
+\end{tabular}
+\label{tab:accuracy}
+\end{table}
 
 In general, we encountered plenty of challenges handling the data and software involved, and in some cases have ideas for addressing or extending this work in the future.
-There were data formating issues in the corpuses which were larger than our expectation.  It was difficult to extract arguments from the corpus, and the extractions were very noisy for example “Cray Computer which *T* -26”, “the perch and Dolphin fields”, etc.
-There were many missing values in the argument fields. Formatting the data for PSL to source turned out to be challenging as we had to fix the missing values and noisy extractions. The missing values created primary key violations when loaded into the PSL database.
-Another challenge was that PropBank annotations, even within the same roleset, represent many word senses.  For example, for the issue.01 roleset, we have the sentence “until Congress acts, the government hasn't any authority to issue new debt obligations of any kind, the Treasury said” and “SHAREDATA Inc. said it will amend a registration statement filed with the Securities and Exchange Commission to delete a plan to sell 500,000 newly issued common shares.”  Upon inspection, we see that the issue relation in Freebase corresponds to the latter sense but not the former.  This creates a challenge for our approach, especially our alignment phase in PSL, since one of our assumptions is that there is a single correspondence between a PropBank relation and a Freebase relation.   It may be that aligning PB rolesets to FB relations is not the right task; a better task may be to discover individual word senses within PB rolesets and align those to FB relations.
-Because of lack of labeled data matching Freebase and Propbank entities, we could not learn the weights of the rules. But if we can hand label data, then we can learn the weights on the rules.
-Freebase relations are sometimes specified in the form of Ids and instead of argument names and the argument names are specified in a separate file. That data was not used for our experiments due to lack of time. If we can extract the argument names corresponding to these relations as well using association mining, then we would have a larger dataset from Freebase as well.
-We only explored the business domain from Freebase. There are other domains which can lead to a match between Propbank and Freebase and those can be used as well.
-
+\begin{itemize}
+\item Because of lack of labeled data matching FB and PB entities, we could not learn the weights of the alignment rules in PSL. But if we can hand label data, then we can learn the weights on the rules.
+\item Another challenge was that PropBank annotations, even within the same roleset, represent many word senses.
+For example, for the issue.01 roleset, we have the sentence ``until Congress acts, the government hasn't any authority to issue new debt obligations of any kind, the Treasury said'' and ``SHAREDATA Inc. said it will amend a registration statement filed with the Securities and Exchange Commission to delete a plan to sell 500,000 newly issued common shares.''
+Upon inspection, we see that the issue relation in Freebase corresponds to the latter sense but not the former.
+This creates a challenge for our approach, especially our alignment phase in PSL, since one of our assumptions is that there is a single correspondence between a PB relation and a FB relation.
+It may be that aligning PB rolesets to FB relations is not the right task; a better task may be to discover individual word senses within PB rolesets and align those to FB relations.
+\item FB relations are sometimes specified in the form of Ids and instead of argument names and the argument names are specified in a separate file. That data was not used for our experiments due to lack of time. If we can extract the argument names corresponding to these relations as well using association mining, then we would have a larger dataset from Freebase as well.
+\item We only explored the business domain from FB. There are other domains which can lead to a match between PB and FB and those can be used as well.
+\item There were data formating issues in the corpuses which were larger than our expectation.  It was difficult to extract arguments from the corpus, and the extractions were very noisy for example ``Cray Computer which *T* -26,'' ``the perch and Dolphin fields,'' etc.
+\item There were many missing values in the argument fields. Formatting the data for PSL to source turned out to be challenging as we had to fix the missing values and noisy extractions. The missing values created primary key violations when loaded into the PSL database.
+\end{itemize}
