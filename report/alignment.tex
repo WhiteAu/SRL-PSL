@@ -16,20 +16,20 @@ In this example, we want to align agent from PB to acquiring\_company from FB, e
 We performed the alignment using a probabilistic soft logic (PSL) program~\cite{brocheler_probabilistic_2012} comprising the data loaded from PB and FB, and logical rules which act as templates for a constrained continuous Markov random field.
 The variables in the graphical model for a PSL program are real-valued, making it ideal for propagating similarity, such as string similarities, at the instance level between the two data sources to the schema level, which was our goal; and inferences are assigned truth values which allow us to set a minimum threshold to accept mappings.
 We encoded the following three types of alignment rules in PSL.
-(1) Using Levenshtein similarity to capture similarity between relation names, entity names and entity type names.
-(2) Transitivity:  if relation A is similar to relation B, and relation B to relation C, relation A and C are similar.
-And (3) Set similarity:  if the sets of instances of two relations are similar, then the relations are similar.
+(i) Using Levenshtein similarity to capture similarity between relation names, entity names and entity type names.
+(ii) Transitivity:  if relation A is similar to relation B, and relation B to relation C, relation A and C are similar.
+And (iii) Set similarity:  if the sets of instances of two relations are similar, then the relations are similar.
 We now share two specific PSL rules that we used, and explanations of how they work.
-
-m.add rule : (propRelation(I1, R1, A1, A2) \& freebaseRelation(I2, R2, A3, A4) \& similar(R1, R2)) >> sameRelation(R1, R2), weight : 20
-
-Two relations R1 and R2 from PB and FB respectively are same relations if they are similar. Similarity is calculated using Levenshtein distance.
-
-m.add rule : (propRelation(I1, R1, A1, A2) \& freebaseRelation(I2, R2, A3, A4) \& sameEntitySet({R1.propEntityOf(inv)},{R2.freebaseEntityOf(inv)})) >> sameRelation(R1, R2),  weight : 20
-
-This is the set similarity feature in PSL used to compare two sets of values.
+\begin{align}
+w_{1}: rel(I1,R1)\wedge rel(I2,R2) \wedge similar(R1,R2)&\rightarrow sameRel(R1,R2) \label{eq:rel_name}\\
+w_{1}: rel(I1,R1)\wedge rel(I2,R2) \wedge similar(\left\{R1.entOf(inv)\right\},\left\{R2.entOf(inv)\right\}) &\rightarrow sameRel(R1, R2) \label{eq:ent_set}
+\end{align}
+% I made these rules simpler here so they would render nicely in latex.  -- Alex
+In rule~\eqref{eq:rel_name} two relations R1 and R2 from PB and FB respectively are same relations if they are similar. Similarity is calculated using Levenshtein distance.
+Rule~\eqref{eq:ent_set} is the set similarity feature in PSL used to compare two sets of values.
 Here we compare the arguments of propbank to arguments of freebase and indicate a match if arguments are similar.
 Instead of comparing each and every argument, a single rule in PSL can be used for comparing the sets.
+Both rules have weight $w_1 = 20$.
 
 The following table shows example output of our alignment on relations; upon inspection, it appears that mappings with higher truth values are quite close to what we expect.
 Notably, the mapping between hire and employment was inferred through the transitive rule and similarity in argument instances, though the predicate and relation have dissimilar names.
